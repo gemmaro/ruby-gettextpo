@@ -1,0 +1,3 @@
+#!/bin/sh
+set -eu
+gdb --args ruby sample.rb

@@ -1,0 +1,3 @@
+#, c-format
+msgid "msgid1"
+msgstr "%誤"

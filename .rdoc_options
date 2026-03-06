@@ -1,0 +1,6 @@
+main_page: README.md
+exclude:
+  - tmp
+  - bin
+  - Rakefile
+  - Gemfile
