@@ -18,6 +18,7 @@
 #include "gettextpo.h"
 #include <gettext-po.h>
 #include <ruby.h>
+#include <ruby/internal/variable.h>
 
 VALUE rb_cMessage;
 VALUE rb_cMessageIterator;
@@ -823,6 +824,8 @@ RUBY_FUNC_EXPORTED void
 Init_gettextpo (void)
 {
   VALUE rb_mGettextPO = rb_define_module ("GettextPO");
+  rb_define_const (rb_mGettextPO, "LIBGETTEXTPO_VERSION",
+                   libgettextpo_version);
   rb_define_singleton_method (rb_mGettextPO, "header_entry_value",
                               gettextpo_m_header_entry_value, 2);
   rb_define_singleton_method (rb_mGettextPO, "header_with_updated_entry_value",

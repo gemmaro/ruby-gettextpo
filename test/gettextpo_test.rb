@@ -22,6 +22,8 @@ class GettextPOTest < Test::Unit::TestCase
     assert do
       ::GettextPO.const_defined?(:VERSION)
     end
+
+    assert_compare 2944, '<=', GettextPO::LIBGETTEXTPO_VERSION
   end
 
   test "GettextPO::File.new" do
