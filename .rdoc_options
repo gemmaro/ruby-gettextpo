@@ -4,3 +4,4 @@ exclude:
   - bin
   - Rakefile
   - Gemfile
+  - vendor
