@@ -17,29 +17,7 @@
 
 #include "gettextpo.h"
 #include <gettext-po.h>
-#include <ruby/internal/anyargs.h>
-#include <ruby/internal/arithmetic/int.h>
-#include <ruby/internal/core/rdata.h>
-#include <ruby/internal/core/rstring.h>
-#include <ruby/internal/core/rtypeddata.h>
-#include <ruby/internal/eval.h>
-#include <ruby/internal/globals.h>
-#include <ruby/internal/intern/array.h>
-#include <ruby/internal/intern/hash.h>
-#include <ruby/internal/intern/object.h>
-#include <ruby/internal/intern/proc.h>
-#include <ruby/internal/intern/range.h>
-#include <ruby/internal/intern/string.h>
-#include <ruby/internal/intern/vm.h>
-#include <ruby/internal/module.h>
-#include <ruby/internal/scan_args.h>
-#include <ruby/internal/special_consts.h>
-#include <ruby/internal/symbol.h>
-#include <ruby/internal/value.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <time.h>
+#include <ruby.h>
 
 VALUE rb_cMessage;
 VALUE rb_cMessageIterator;
