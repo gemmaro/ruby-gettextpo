@@ -47,7 +47,7 @@ Gem::Specification.new do |spec|
     'rubygems_mfa_required' => 'true',
     'bug_tracker_uri'       => "#{spec.homepage}/issues",
     'changelog_uri'         => "#{spec.homepage}/src/branch/main/CHANGELOG.md",
-    # 'documentation_uri'     => "https://gemmaro.github.io/#{name}", TODO
+    'documentation_uri'     => "https://gemmaro.github.io/ruby-gettextpo/",
     'homepage_uri'          => spec.homepage,
     'source_code_uri'       => spec.homepage,
     'wiki_uri'              => "#{spec.homepage}/wiki",
