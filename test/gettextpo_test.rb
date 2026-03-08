@@ -221,4 +221,16 @@ class GettextPOTest < Test::Unit::TestCase
                   severity: 1 }]
     assert_equal [], xerrors2
   end
+
+  def _create_message_and_drop_file
+    file = GettextPO::File.new
+    iterator = file.message_iterator
+    iterator.insert("msgid1", "msgstr1")
+  end
+
+  test "dangling pointer" do
+    message = _create_message_and_drop_file
+    GC.start(full_mark: true, immediate_sweep: true)
+    assert_equal "msgid1", message.msgid
+  end
 end
