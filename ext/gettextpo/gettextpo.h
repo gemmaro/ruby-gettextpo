@@ -18,6 +18,7 @@
 #ifndef GETTEXTPO_H
 #define GETTEXTPO_H 1
 
-#include "ruby.h"
+#include <gettext-po.h>
+#include <ruby.h>
 
 #endif /* GETTEXTPO_H */

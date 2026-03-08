@@ -16,15 +16,20 @@
  */
 
 #include "gettextpo.h"
-#include <gettext-po.h>
-#include <ruby.h>
-#include <ruby/internal/arithmetic/int.h>
-#include <ruby/internal/variable.h>
 
 VALUE rb_cMessage;
 VALUE rb_cMessageIterator;
 VALUE rb_cFilePos;
 VALUE rb_eError;
+
+/* FilePos, Message, and MessageIterator each hold a @file instance
+ * variable (ivar) pointing to the GettextPO::File object that owns
+ * the underlying po_file_t.  This prevents the File object from being
+ * garbage collected while any of these objects are still alive, which
+ * would otherwise cause their po_file_t pointers to become dangling.
+ * When allocating one of these objects, @file must be propagated from
+ * the parent object: File -> MessageIterator -> Message -> FilePos.
+ */
 
 /* ********** error ********** */
 
@@ -33,6 +38,7 @@ static struct
   bool error;
   VALUE *user_xerror;
   VALUE *user_xerror2;
+  VALUE *file;
 } gettextpo_xerror_context = {};
 
 static void
@@ -41,6 +47,7 @@ gettextpo_xerror_context_reset (void)
   gettextpo_xerror_context.error = false;
   gettextpo_xerror_context.user_xerror = NULL;
   gettextpo_xerror_context.user_xerror2 = NULL;
+  gettextpo_xerror_context.file = NULL;
 }
 
 static void
@@ -59,6 +66,8 @@ gettextpo_xerror (const int severity, const po_message_t message,
     {
       VALUE message_value = rb_obj_alloc (rb_cMessage);
       DATA_PTR (message_value) = message;
+      rb_ivar_set (message_value, rb_intern ("@file"),
+                   *gettextpo_xerror_context.file);
       rb_hash_aset (kwargs, ID2SYM (rb_intern ("message")), message_value);
     }
   if (filename)
@@ -100,6 +109,8 @@ gettextpo_xerror2 (const int severity, const po_message_t message1,
     {
       VALUE message_value1 = rb_obj_alloc (rb_cMessage);
       DATA_PTR (message_value1) = message1;
+      rb_ivar_set (message_value1, rb_intern ("@file"),
+                   *gettextpo_xerror_context.file);
       rb_hash_aset (kwargs, ID2SYM (rb_intern ("message1")), message_value1);
     }
   if (filename1)
@@ -118,6 +129,8 @@ gettextpo_xerror2 (const int severity, const po_message_t message1,
     {
       VALUE message_value2 = rb_obj_alloc (rb_cMessage);
       DATA_PTR (message_value2) = message2;
+      rb_ivar_set (message_value2, rb_intern ("@file"),
+                   *gettextpo_xerror_context.file);
       rb_hash_aset (kwargs, ID2SYM (rb_intern ("message2")), message_value2);
     }
   if (filename2)
@@ -450,6 +463,8 @@ gettextpo_po_message_m_filepos (VALUE self, VALUE index)
     {
       VALUE filepos = rb_obj_alloc (rb_cFilePos);
       DATA_PTR (filepos) = pos;
+      rb_ivar_set (filepos, rb_intern ("@file"),
+                   rb_ivar_get (self, rb_intern ("@file")));
       return filepos;
     }
   else
@@ -491,6 +506,8 @@ gettextpo_po_message_m_check_all (int argc, VALUE *argv, VALUE self)
   VALUE kwargs_vals[] = { Qundef, Qundef };
   rb_get_kwargs (kwargs, kwargs_ids, 0, 2, kwargs_vals);
   gettextpo_xerror_context_reset ();
+  VALUE file = rb_ivar_get (self, rb_intern ("@file"));
+  gettextpo_xerror_context.file = &file;
   if (kwargs_vals[0] != Qundef)
     gettextpo_xerror_context.user_xerror = &kwargs_vals[0];
   if (kwargs_vals[1] != Qundef)
@@ -516,6 +533,8 @@ gettextpo_po_message_m_check_format (int argc, VALUE *argv, VALUE self)
   VALUE kwargs_vals[] = { Qundef, Qundef };
   rb_get_kwargs (kwargs, kwargs_ids, 0, 2, kwargs_vals);
   gettextpo_xerror_context_reset ();
+  VALUE file = rb_ivar_get (self, rb_intern ("@file"));
+  gettextpo_xerror_context.file = &file;
   if (kwargs_vals[0] != Qundef)
     gettextpo_xerror_context.user_xerror = &kwargs_vals[0];
   if (kwargs_vals[1] != Qundef)
@@ -568,11 +587,12 @@ gettextpo_po_file_m_read (int argc, VALUE *argv, VALUE klass)
   VALUE kwargs_vals[] = { Qundef, Qundef };
   rb_get_kwargs (kwargs, kwargs_ids, 0, 2, kwargs_vals);
   gettextpo_xerror_context_reset ();
+  VALUE self = rb_obj_alloc (klass);
+  gettextpo_xerror_context.file = &self;
   if (kwargs_vals[0] != Qundef)
     gettextpo_xerror_context.user_xerror = &kwargs_vals[0];
   if (kwargs_vals[1] != Qundef)
     gettextpo_xerror_context.user_xerror2 = &kwargs_vals[1];
-  VALUE self = rb_obj_alloc (klass);
   DATA_PTR (self)
       = po_file_read (StringValueCStr (filename), &gettextpo_xerror_handler);
   if (gettextpo_xerror_context.error)
@@ -594,6 +614,7 @@ gettextpo_po_file_m_write (int argc, VALUE *argv, VALUE self)
   VALUE kwargs_vals[] = { Qundef, Qundef };
   rb_get_kwargs (kwargs, kwargs_ids, 0, 2, kwargs_vals);
   gettextpo_xerror_context_reset ();
+  gettextpo_xerror_context.file = &self;
   if (kwargs_vals[0] != Qundef)
     gettextpo_xerror_context.user_xerror = &kwargs_vals[0];
   if (kwargs_vals[1] != Qundef)
@@ -626,6 +647,7 @@ gettextpo_po_file_m_message_iterator (int argc, VALUE *argv, VALUE self)
   VALUE iterator = rb_obj_alloc (rb_cMessageIterator);
   DATA_PTR (iterator) = po_message_iterator (
       DATA_PTR (self), NIL_P (domain) ? NULL : StringValueCStr (domain));
+  rb_ivar_set (iterator, rb_intern ("@file"), self);
   return iterator;
 }
 
@@ -660,6 +682,7 @@ gettextpo_po_file_m_check_all (int argc, VALUE *argv, VALUE self)
   VALUE kwargs_vals[] = { Qundef, Qundef };
   rb_get_kwargs (kwargs, kwargs_ids, 0, 2, kwargs_vals);
   gettextpo_xerror_context_reset ();
+  gettextpo_xerror_context.file = &self;
   if (kwargs_vals[0] != Qundef)
     gettextpo_xerror_context.user_xerror = &kwargs_vals[0];
   if (kwargs_vals[1] != Qundef)
@@ -698,6 +721,8 @@ gettextpo_po_message_iterator_m_next (VALUE self)
     {
       VALUE message_value = rb_obj_alloc (rb_cMessage);
       DATA_PTR (message_value) = message;
+      rb_ivar_set (message_value, rb_intern ("@file"),
+                   rb_ivar_get (self, rb_intern ("@file")));
       return message_value;
     }
   else
@@ -716,6 +741,8 @@ gettextpo_po_message_iterator_m_insert (VALUE self, VALUE msgid, VALUE msgstr)
   po_message_insert (DATA_PTR (self), message);
   VALUE value = rb_obj_alloc (rb_cMessage);
   DATA_PTR (value) = message;
+  rb_ivar_set (value, rb_intern ("@file"),
+               rb_ivar_get (self, rb_intern ("@file")));
   return value;
 }
 
