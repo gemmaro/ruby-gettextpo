@@ -55,15 +55,14 @@ GettextPO::File.read(po_path).message_iterator.each do |message|
 end
 ```
 
-Please refer to the API documentation and test cases for details.
+Please refer to the [API documentation][api] and test cases for
+details.
+
+[api]: https://gemmaro.github.io/ruby-gettextpo/
 
 ## Development
 
 `./bin/debug` to debug when segmentation fault.
-
-References: [RubyのC APIの手引き 決定版][def], [Developers'
-documentation for Ruby][dev], [Rubyの拡張ライブラリの作り方][ext],
-[library rdoc/parser/c][parser], and [library rdoc][rdoc].
 
 After checking out the repo, run `bin/setup` to install
 dependencies. Then, run `rake test` to run the tests. You can also run
@@ -76,16 +75,16 @@ install`.  To release a new version, update the version number in
 create a git tag for the version, push git commits and the created
 tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
-[def]: https://gemmaro.github.io/emberb/
-[dev]: https://docs.ruby-lang.org/capi/en/master/index.html
-[ext]: https://docs.ruby-lang.org/en/master/extension_ja_rdoc.html
-[parser]: https://docs.ruby-lang.org/ja/latest/library/rdoc=2fparser=2fc.html
-[rdoc]: https://docs.ruby-lang.org/ja/latest/library/rdoc.html
-
 ## Contributing
 
-Bug reports and pull requests are welcome on Disroot at
-<https://git.disroot.org/gemmaro/ruby-gettextpo>.
+Bug reports and pull requests are welcome on [Disroot][disroot].
+
+Other links:
+
+* [RubyGems](https://rubygems.org/gems/gettextpo)
+* [GitHub repository](https://github.com/gemmaro/ruby-gettextpo)
+
+[disroot]: https://git.disroot.org/gemmaro/ruby-gettextpo
 
 ## License
 
