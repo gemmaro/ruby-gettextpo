@@ -23,6 +23,10 @@ require_relative "gettextpo/gettextpo"
 #
 # == Error handling
 #
+# There are two kinds of errors in this gem.  The first is for
+# exception handlings of libgettextpo.  The second is regular error
+# raising from this gem.
+#
 # Some functions takes exception error handling paramters like
 # +xerror+ and +xerror2+.  These parameters expect +Proc+ object which
 # takes several parameters.  See also the description of
@@ -30,8 +34,11 @@ require_relative "gettextpo/gettextpo"
 # parameters is either SEVERITY_WARNING, SEVERITY_ERROR, or
 # SEVERITY_FATAL_ERROR.
 #
+# This gem normally raises +GettextPO::Error+ object, except for the
+# standard ones, +StopIteration+ for example.
+#
 module GettextPO
-  class Error < StandardError; end
+  class Error < StandardError; end # :nodoc:
 
   # This class doesn't provide the +new+ class method.  Refre to
   # GettextPO::MessageIterator#next or
