@@ -20,6 +20,16 @@ require_relative "gettextpo/gettextpo"
 
 # The main entrypoints to parse PO files are GettextPO::File.new and
 # GettextPO::File.read.
+#
+# == Error handling
+#
+# Some functions takes exception error handling paramters like
+# +xerror+ and +xerror2+.  These parameters expect +Proc+ object which
+# takes several parameters.  See also the description of
+# GettextPO::File.read method.  The +severity+ parameter among these
+# parameters is either SEVERITY_WARNING, SEVERITY_ERROR, or
+# SEVERITY_FATAL_ERROR.
+#
 module GettextPO
   class Error < StandardError; end
 

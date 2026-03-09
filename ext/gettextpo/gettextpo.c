@@ -1,5 +1,4 @@
-/**
- * Copyright (C) 2026  gemmaro
+/* Copyright (C) 2026  gemmaro
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -495,7 +494,7 @@ gettextpo_po_message_m_add_filepos (VALUE self, VALUE file, VALUE start_line)
 /**
  * call-seq: check_all (iterator, xerror: nil, xerror2: nil)
  *
- * See also GettextPO::File.read.
+ * See also GettextPO::File.read for exception error handlings.
  */
 VALUE
 gettextpo_po_message_m_check_all (int argc, VALUE *argv, VALUE self)
@@ -522,7 +521,7 @@ gettextpo_po_message_m_check_all (int argc, VALUE *argv, VALUE self)
 /**
  * call-seq: check_format (xerror: nil, xerror2: nil)
  *
- * See also GettextPO::File.read.
+ * See also GettextPO::File.read for exception error handlings.
  */
 VALUE
 gettextpo_po_message_m_check_format (int argc, VALUE *argv, VALUE self)
@@ -580,7 +579,8 @@ gettextpo_po_file_m_initialize (VALUE self)
  * +multiline+, and +message_text+.  +xerror2+ takes keyword arguments
  * +severity+, +message1+, +filename1+, +lineno1+, +column1+,
  * +multiline1+, +message_text1+, +message2+, +filename2+, +lineno2+,
- * +column2+, +multiline2+, and +message_text2+.
+ * +column2+, +multiline2+, and +message_text2+.  See also GettextPO
+ * for general exception handlings.
  */
 VALUE
 gettextpo_po_file_m_read (int argc, VALUE *argv, VALUE klass)
@@ -607,7 +607,7 @@ gettextpo_po_file_m_read (int argc, VALUE *argv, VALUE klass)
 /**
  * call-seq: write (filename, xerror: nil, xerror2: nil)
  *
- * See also ::read.
+ * See also ::read for exception error handlings.
  */
 VALUE
 gettextpo_po_file_m_write (int argc, VALUE *argv, VALUE self)
@@ -656,7 +656,7 @@ gettextpo_po_file_m_message_iterator (int argc, VALUE *argv, VALUE self)
 }
 
 /**
- * call-seq: domain_header (domain)
+ * call-seq: domain_header (domain = nil)
  *
  * +domain+ can be +nil+ to use a default.  Possibly returns +nil+.
  *
@@ -675,7 +675,7 @@ gettextpo_po_file_m_domain_header (int argc, VALUE *argv, VALUE self)
 /**
  * call-seq: check_all (xerror: nil, xerror2: nil)
  *
- * See also ::read.
+ * See also ::read for exception error handlings.
  */
 VALUE
 gettextpo_po_file_m_check_all (int argc, VALUE *argv, VALUE self)
@@ -842,6 +842,8 @@ gettextpo_po_format_list (VALUE self)
  * call-seq: format_pretty_name (format)
  *
  * Possibly returns +nil+.
+ *
+ * See also ::formats method for available format types.
  */
 VALUE
 gettextpo_po_format_pretty_name (VALUE self, VALUE format)
