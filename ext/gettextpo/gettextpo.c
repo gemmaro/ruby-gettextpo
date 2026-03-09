@@ -14,13 +14,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "gettextpo.h"
-
-VALUE rb_cMessage;
-VALUE rb_cMessageIterator;
-VALUE rb_cFilePos;
-VALUE rb_eError;
-
 /* FilePos, Message, and MessageIterator each hold a @file instance
  * variable (ivar) pointing to the GettextPO::File object that owns
  * the underlying po_file_t.  This prevents the File object from being
@@ -29,6 +22,18 @@ VALUE rb_eError;
  * When allocating one of these objects, @file must be propagated from
  * the parent object: File -> MessageIterator -> Message -> FilePos.
  */
+
+#include "gettextpo.h"
+#include <ruby/internal/core/rdata.h>
+#include <ruby/internal/intern/variable.h>
+
+#define ERROR                                                                 \
+  rb_const_get (rb_const_get (rb_cObject, rb_intern ("GettextPO")),           \
+                rb_intern ("Error"))
+
+VALUE rb_cMessage;
+VALUE rb_cMessageIterator;
+VALUE rb_cFilePos;
 
 /* ********** error ********** */
 
@@ -415,7 +420,7 @@ gettextpo_po_message_m_format_set (int argc, VALUE *argv, VALUE self)
   bool opposite = !RB_UNDEF_P (kwargs_vals[0]) && RB_TEST (kwargs_vals[0]);
   bool remove = !RB_UNDEF_P (kwargs_vals[1]) && RB_TEST (kwargs_vals[1]);
   if (opposite && remove)
-    rb_raise (rb_eError, "opposite and remove cannot be set at the same time");
+    rb_raise (ERROR, "opposite and remove cannot be set at the same time");
   po_message_set_format (DATA_PTR (self), StringValueCStr (format),
                          opposite ? 0 : (remove ? -1 : 1));
   return Qnil;
@@ -514,7 +519,7 @@ gettextpo_po_message_m_check_all (int argc, VALUE *argv, VALUE self)
   po_message_check_all (DATA_PTR (self), DATA_PTR (iterator),
                         &gettextpo_xerror_handler);
   if (gettextpo_xerror_context.error)
-    rb_raise (rb_eError, "check all for message failed");
+    rb_raise (ERROR, "check all for message failed");
   return Qnil;
 }
 
@@ -540,7 +545,7 @@ gettextpo_po_message_m_check_format (int argc, VALUE *argv, VALUE self)
     gettextpo_xerror_context.user_xerror2 = &kwargs_vals[1];
   po_message_check_format (DATA_PTR (self), &gettextpo_xerror_handler);
   if (gettextpo_xerror_context.error)
-    rb_raise (rb_eError, "check format for message failed");
+    rb_raise (ERROR, "check format for message failed");
   return Qnil;
 }
 
@@ -600,7 +605,7 @@ gettextpo_po_file_m_read (int argc, VALUE *argv, VALUE klass)
   DATA_PTR (self)
       = po_file_read (StringValueCStr (filename), &gettextpo_xerror_handler);
   if (gettextpo_xerror_context.error)
-    rb_raise (rb_eError, "failed to read");
+    rb_raise (ERROR, "failed to read");
   return self;
 }
 
@@ -626,7 +631,7 @@ gettextpo_po_file_m_write (int argc, VALUE *argv, VALUE self)
   po_file_write (DATA_PTR (self), StringValueCStr (filename),
                  &gettextpo_xerror_handler);
   if (gettextpo_xerror_context.error)
-    rb_raise (rb_eError, "failed to write");
+    rb_raise (ERROR, "failed to write");
   return Qnil;
 }
 
@@ -693,7 +698,7 @@ gettextpo_po_file_m_check_all (int argc, VALUE *argv, VALUE self)
     gettextpo_xerror_context.user_xerror2 = &kwargs_vals[1];
   po_file_check_all (DATA_PTR (self), &gettextpo_xerror_handler);
   if (gettextpo_xerror_context.error)
-    rb_raise (rb_eError, "check all for file failed");
+    rb_raise (ERROR, "check all for file failed");
   return Qnil;
 }
 
@@ -961,6 +966,4 @@ Init_gettextpo (void)
   rb_define_method (rb_cFilePos, "file", gettextpo_po_filepos_m_file, 0);
   rb_define_method (rb_cFilePos, "start_line",
                     gettextpo_po_filepos_m_start_line, 0);
-  rb_eError
-      = rb_define_class_under (rb_mGettextPO, "Error", rb_eStandardError);
 }
