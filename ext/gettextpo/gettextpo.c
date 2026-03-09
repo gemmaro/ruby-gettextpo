@@ -561,6 +561,10 @@ gettextpo_po_file_alloc (VALUE self)
   return TypedData_Wrap_Struct (self, &gettextpo_po_file_type, NULL);
 }
 
+/**
+ * See also #message_iterator and GettextPO::MessageIterator#insert
+ * methods for the further manipulations.
+ */
 VALUE
 gettextpo_po_file_m_initialize (VALUE self)
 {
