@@ -151,7 +151,7 @@ gettextpo_xerror2 (const int severity, const po_message_t message1,
                   rb_str_new_cstr (message_text2));
   VALUE args = rb_ary_new ();
   rb_ary_push (args, kwargs);
-  rb_proc_call_kw (*gettextpo_xerror_context.user_xerror, args,
+  rb_proc_call_kw (*gettextpo_xerror_context.user_xerror2, args,
                    RB_PASS_KEYWORDS);
   if (severity == PO_SEVERITY_FATAL_ERROR)
     abort ();
@@ -602,6 +602,8 @@ gettextpo_po_file_m_read (int argc, VALUE *argv, VALUE klass)
     gettextpo_xerror_context.user_xerror = &kwargs_vals[0];
   if (kwargs_vals[1] != Qundef)
     gettextpo_xerror_context.user_xerror2 = &kwargs_vals[1];
+  /* TODO: po_file_read can return NULL when not found?  Also check
+     null at file free. */
   DATA_PTR (self)
       = po_file_read (StringValueCStr (filename), &gettextpo_xerror_handler);
   if (gettextpo_xerror_context.error)
