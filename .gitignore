@@ -13,3 +13,4 @@
 mkmf.log
 /test/tmp/
 !/test/tmp/.keep
+/build_config.rb.lock
