@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # Copyright (C) 2026  gemmaro
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,23 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-require "bundler/gem_tasks"
-require "rake/testtask"
-
-Rake::TestTask.new(:test) do |t|
-  t.libs << "test.cruby"
-  t.libs << "lib"
-  t.test_files = FileList["test.cruby/**/*_test.rb"]
+assert 'format' do
+  assert_true GettextPO.formats.member?("c-format")
+  assert_equal "C#", GettextPO.format_pretty_name("csharp-format")
+  true
 end
-
-require "rake/extensiontask"
-
-task build: :compile
-
-GEMSPEC = Gem::Specification.load("gettextpo.gemspec")
-
-Rake::ExtensionTask.new("gettextpo", GEMSPEC) do |ext|
-  ext.lib_dir = "lib/gettextpo"
-end
-
-task default: %i[clobber compile test]

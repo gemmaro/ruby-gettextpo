@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # Copyright (C) 2026  gemmaro
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,23 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-require "bundler/gem_tasks"
-require "rake/testtask"
+assert 'basic' do
+  assert_raise(NoMethodError) do
+    GettextPO::FilePos.new
+  end
 
-Rake::TestTask.new(:test) do |t|
-  t.libs << "test.cruby"
-  t.libs << "lib"
-  t.test_files = FileList["test.cruby/**/*_test.rb"]
+  path = File.expand_path(File.join(__FILE__, "../../test.cruby/resources/filepos.po"))
+  message = GettextPO::File.read(path).message_iterator.next
+  assert_equal "spec1.txt", message.filepos(0).file
+  assert_equal 1188, message.filepos(1).start_line
+  message.remove_filepos(0)
+  assert_equal "spec2.txt", message.filepos(0).file
+  assert_nil message.filepos(1)
+  message.add_filepos("roku-nana.txt", 67)
+  assert_equal "roku-nana.txt", message.filepos(1).file
+  true
 end
-
-require "rake/extensiontask"
-
-task build: :compile
-
-GEMSPEC = Gem::Specification.load("gettextpo.gemspec")
-
-Rake::ExtensionTask.new("gettextpo", GEMSPEC) do |ext|
-  ext.lib_dir = "lib/gettextpo"
-end
-
-task default: %i[clobber compile test]
