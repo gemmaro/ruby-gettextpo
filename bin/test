@@ -4,6 +4,4 @@ set -eu
 : "${MRUBY_SRC?no mruby source directory is set}"
 
 export MRUBY_CONFIG="$PWD/build_config.rb"
-rake --directory "$MRUBY_SRC" clean all
-
-gdb --args "${MRUBY_SRC}/bin/mruby" sample.rb
+rake --directory "$MRUBY_SRC" clean all test
