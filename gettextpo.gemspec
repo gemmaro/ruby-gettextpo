@@ -28,6 +28,7 @@ Gem::Specification.new do |spec|
   spec.homepage = "https://git.disroot.org/gemmaro/ruby-gettextpo"
   spec.license = "GPL-3.0-or-later" # https://spdx.org/licenses/
   spec.required_ruby_version = ">= 3.1.0"
+  spec.requirements << 'libgettextpo'
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://git.disroot.org/gemmaro/ruby-gettextpo.git"
