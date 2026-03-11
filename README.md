@@ -3,8 +3,8 @@
 This is a Ruby library for the GNU gettext PO files.  This is a C
 binding of the libgettextpo library, which is provided by the GNU
 gettext package.  The API of this gem is designed to promote Ruby's
-idiomatic coding style while avoiding memory safety.  Currently this
-supports both CRuby and mruby.
+idiomatic coding style while paying attensiton to memory safety.
+Currently this supports both CRuby and mruby.
 
 ## Installation
 
