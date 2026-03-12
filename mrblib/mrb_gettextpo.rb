@@ -37,31 +37,7 @@ module GettextPO
     end
   end
 
-  class MessageIterator
-    def self.new
-      raise NoMethodError,
-            "please use other methods instead, such as GettextPO::File#message_iterator"
-    end
-
-    def each # yields: message
-      while true
-        begin
-          yield self.next
-        rescue StopIteration
-          return self
-        end
-      end
-    end
-
-    include Enumerable
-  end
-
   class Message
-    def self.new
-      raise NoMethodError,
-            "please use other methods instead, such as GettextPO::MessageIterator#next"
-    end
-
     # It seems that calling Proc with keyword arguments is not yet
     # supported.
     alias original_check_all check_all
@@ -77,13 +53,6 @@ module GettextPO
     def check_format(xerror: nil, xerror2: nil)
       original_check_format(xerror: xerror && Proc.new { |kwargs| xerror.(**kwargs) },
                             xerror2: xerror2 && Proc.new { |kwargs| xerror2.(**kwargs) })
-    end
-  end
-
-  class FilePos
-    def self.new
-      raise NoMethodError,
-            "please use other methods instead, such as GettextPO::Message#filepos"
     end
   end
 end
