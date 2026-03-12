@@ -5,3 +5,8 @@ exclude:
   - Rakefile
   - Gemfile
   - vendor
+  - test.cruby/**/*
+  - build_config.rb.lock
+  - mrbgem.rake
+  - mrblib/mrb_gettextpo.rb
+  - mrblib/mrb_gettextpo_version.rb
