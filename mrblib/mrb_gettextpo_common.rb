@@ -40,7 +40,7 @@ module GettextPO
   # This class doesn't provide the +new+ class method.  See also
   # GettextPO::File#message_iterator.
   class MessageIterator
-    def self.new
+    def self.new # :nodoc:
       raise NoMethodError,
             "please use other methods instead, such as GettextPO::File#message_iterator"
     end
@@ -62,7 +62,7 @@ module GettextPO
   # GettextPO::MessageIterator#next or
   # GettextPO::MessageIterator#insert.
   class Message
-    def self.new
+    def self.new # :nodoc:
       raise NoMethodError,
             "please use other methods instead, such as GettextPO::MessageIterator#next"
     end
@@ -71,7 +71,7 @@ module GettextPO
   # This class doesn't provide the +new+ class method.  See also
   # GettextPO::Message#filepos.
   class FilePos
-    def self.new
+    def self.new # :nodoc:
       raise NoMethodError,
             "please use other methods instead, such as GettextPO::Message#filepos"
     end
