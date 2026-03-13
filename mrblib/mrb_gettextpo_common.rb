@@ -58,7 +58,7 @@ module GettextPO
     include Enumerable
   end
 
-  # This class doesn't provide the +new+ class method.  Refre to
+  # This class doesn't provide the +new+ class method.  Refer to
   # GettextPO::MessageIterator#next or
   # GettextPO::MessageIterator#insert.
   class Message
