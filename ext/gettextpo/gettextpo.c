@@ -24,6 +24,7 @@
  */
 
 #include "gettextpo.h"
+#include <gettext-po.h>
 #include <ruby/internal/core/rdata.h>
 #include <ruby/internal/intern/variable.h>
 
@@ -551,10 +552,17 @@ gettextpo_po_message_m_check_format (int argc, VALUE *argv, VALUE self)
 
 /* ********** file ********** */
 
+void
+gettextpo_file_free (void *file)
+{
+  if (file)
+    po_file_free (file);
+}
+
 static const rb_data_type_t gettextpo_po_file_type = {
   .wrap_struct_name = "gettextpo PO file",
   .function = {
-    .dfree = (void (*)(void *)) po_file_free,
+    .dfree = gettextpo_file_free,
   },
   .flags = RUBY_TYPED_FREE_IMMEDIATELY,
 };
@@ -602,13 +610,17 @@ gettextpo_po_file_m_read (int argc, VALUE *argv, VALUE klass)
     gettextpo_xerror_context.user_xerror = &kwargs_vals[0];
   if (kwargs_vals[1] != Qundef)
     gettextpo_xerror_context.user_xerror2 = &kwargs_vals[1];
-  /* TODO: po_file_read can return NULL when not found?  Also check
-     null at file free. */
-  DATA_PTR (self)
+  po_file_t file
       = po_file_read (StringValueCStr (filename), &gettextpo_xerror_handler);
-  if (gettextpo_xerror_context.error)
-    rb_raise (ERROR, "failed to read");
-  return self;
+  if (file)
+    {
+      DATA_PTR (self) = file;
+      if (gettextpo_xerror_context.error)
+        rb_raise (ERROR, "failed to read");
+      return self;
+    }
+  else
+    rb_raise (ERROR, "failed to read file, maybe file not found?");
 }
 
 /**

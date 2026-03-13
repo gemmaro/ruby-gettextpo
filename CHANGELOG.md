@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- CRuby: Fix file not found case.
+
 ## CRuby version 0.1.2 and mruby version 0.1.0 - 2026-03-11
 
 - Add mruby version.

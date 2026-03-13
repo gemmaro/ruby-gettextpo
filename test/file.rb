@@ -22,6 +22,10 @@ assert "read" do
   path = File.expand_path(File.join(__FILE__, "../../test.cruby/resources/ok.po"))
   assert_kind_of GettextPO::File, GettextPO::File.read(path)
 
+  assert_raise(GettextPO::Error) do
+    GettextPO::File.read(File.join(__FILE__, '../not-there'))
+  end
+
   xerrors = []
   assert_raise(GettextPO::Error) do
     path = File.expand_path(File.join(__FILE__, "../../test.cruby/resources/a.po"))
