@@ -472,15 +472,20 @@ BOOL_SETTER (fuzzy);
   }
 
 /**
+ * Document-method: workflow_flag?
  * call-seq: workflow_flag? (flag)
  */
 FLAG_Q (workflow);
 
 /**
+ * Document-method: update_workflow_flag
  * call-seq: update_workflow_flag (flag, set: true)
  */
 UPDATE_FLAG (workflow);
 
+/**
+ * Document-method: workflow_flag_iterator
+ */
 FLAG_ITER (workflow);
 
 /**
@@ -545,15 +550,20 @@ gettextpo_po_message_m_format_set (int argc, VALUE *argv, VALUE self)
 
 #ifdef HAVE_PO_MESSAGE_GET_FORMAT
 /**
+ * Document-method: sticky_flag?
  * call-seq: sticky_flag? (flag)
  */
 FLAG_Q (sticky);
 
 /**
+ * Document-method: update_sticky_flag
  * call-seq: update_sticky_flag (flag, set: true)
  */
 UPDATE_FLAG (sticky);
 
+/**
+ * Document-method: sticky_flag_iterator
+ */
 FLAG_ITER (sticky);
 #endif
 
