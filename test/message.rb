@@ -72,3 +72,17 @@ assert 'getters and setters' do
   assert_true message.range?(1..2)
   true
 end
+
+assert 'flags' do
+  path = File.expand_path(File.join(__FILE__, "../../test.cruby/resources/ok.po"))
+  iterator = GettextPO::File.read(path).message_iterator
+  message = iterator.next
+  assert_false message.workflow_flag?('fuzzy')
+  message.update_workflow_flag('fuzzy')
+  assert_true message.workflow_flag?('fuzzy')
+  message.update_workflow_flag('fuzzy', set: false)
+  assert_false message.workflow_flag?('fuzzy')
+  message.update_sticky_flag('no-wrap')
+  assert_true message.sticky_flag?('no-wrap')
+  true
+end

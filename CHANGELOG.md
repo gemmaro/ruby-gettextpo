@@ -2,7 +2,13 @@
 
 ## Unreleased
 
-- CRuby and mruby: Add `GettextPO::Message#file_positions` method.
+- CRuby and mruby: Add `GettextPO::Message#file_positions`,
+  `GettextPO::Message#workflow_flag?`,
+  `GettextPO::Message#update_workflow_flag`,
+  `GettextPO::Message#workflow_flag_iterator`,
+  `GettextPO::Message#sticky_flag?`,
+  `GettextPO::Message#update_sticky_flag`, and
+  `GettextPO::Message#sticky_flag_iterator` method.
 - mruby: Requires GNU gettext 1.0 or later.
 
 ## CRuby version 0.1.3

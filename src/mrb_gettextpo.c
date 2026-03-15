@@ -37,6 +37,8 @@
 
 #define MODULE mrb_module_get_id (mrb, MRB_SYM (GettextPO))
 #define MESSAGE mrb_class_get_under_id (mrb, MODULE, MRB_SYM (Message))
+#define FLAG_ITERATOR                                                         \
+  mrb_class_get_under_id (mrb, MODULE, MRB_SYM (FlagIterator))
 #define ERROR mrb_class_get_under_id (mrb, MODULE, MRB_SYM (Error))
 
 #define NIL mrb_nil_value ()
@@ -69,6 +71,18 @@ gettextpo_m_header_with_updated_entry_value (mrb_state *mrb, mrb_value klass)
   free (updated_header);
   return header_value;
 }
+
+static void
+gettextpo_flag_iterator_free (mrb_state *mrb, void *iter)
+{
+  if (iter)
+    po_flag_iterator_free (iter);
+}
+
+static const struct mrb_data_type gettextpo_flag_iterator_data_type = {
+  .struct_name = "gettextpo flag iterator",
+  .dfree = gettextpo_flag_iterator_free,
+};
 
 static void
 gettextpo_message_free (mrb_state *mrb, void *message)
@@ -179,6 +193,46 @@ BOOL_SETTER (obsolete);
 BOOL_GETTER (fuzzy);
 BOOL_SETTER (fuzzy);
 
+#define QUERY_FLAG(name)                                                      \
+  static mrb_value gettextpo_message_m_##name##_flag_q (mrb_state *mrb,       \
+                                                        mrb_value self)       \
+  {                                                                           \
+    char *flag = NULL;                                                        \
+    mrb_get_args (mrb, "z", &flag);                                           \
+                                                                              \
+    return mrb_bool_value (                                                   \
+        po_message_has_##name##_flag (DATA_PTR (self), flag));                \
+  }
+#define UPDATE_FLAG(name)                                                     \
+  static mrb_value gettextpo_message_m_##name##_flag_update (mrb_state *mrb,  \
+                                                             mrb_value self)  \
+  {                                                                           \
+    char *flag = NULL;                                                        \
+    mrb_sym table[] = { MRB_SYM (set) };                                      \
+    size_t num = sizeof (table) / sizeof (table[0]);                          \
+    mrb_value values[] = { mrb_undef_value () };                              \
+    mrb_kwargs kwargs = { .num = num, .table = table, .values = values };     \
+    mrb_get_args (mrb, "z:", &flag, &kwargs);                                 \
+                                                                              \
+    po_message_set_##name##_flag (DATA_PTR (self), flag,                      \
+                                  mrb_undef_p (values[0])                     \
+                                      || mrb_test (values[0]));               \
+    return mrb_nil_value ();                                                  \
+  }
+#define FLAG_ITERATOR_METHOD(name)                                            \
+  static mrb_value gettextpo_message_m_##name##_flag_iterator (               \
+      mrb_state *mrb, mrb_value self)                                         \
+  {                                                                           \
+    return mrb_obj_value (mrb_data_object_alloc (                             \
+        mrb, FLAG_ITERATOR,                                                   \
+        po_message_##name##_flags_iterator (DATA_PTR (self)),                 \
+        &gettextpo_flag_iterator_data_type));                                 \
+  }
+
+QUERY_FLAG (workflow);
+UPDATE_FLAG (workflow);
+FLAG_ITERATOR_METHOD (workflow);
+
 static mrb_value
 gettextpo_message_m_format_q (mrb_state *mrb, mrb_value self)
 {
@@ -229,6 +283,10 @@ gettextpo_message_m_format_set (mrb_state *mrb, mrb_value self)
                          opposite ? 0 : (remove ? -1 : 1));
   return NIL;
 }
+
+QUERY_FLAG (sticky);
+UPDATE_FLAG (sticky);
+FLAG_ITERATOR_METHOD (sticky);
 
 static mrb_value
 gettextpo_message_m_range (mrb_state *mrb, mrb_value self)
@@ -807,12 +865,30 @@ mrb_mruby_gettextpo_gem_init (mrb_state *const mrb)
   mrb_define_method_id (mrb, mrb_cMessage, MRB_SYM_E (fuzzy),
                         gettextpo_message_m_fuzzy_set, MRB_ARGS_REQ (1));
 
-  mrb_define_method_id (mrb, mrb_cMessage, MRB_SYM (format),
-                        gettextpo_message_m_format, MRB_ARGS_REQ (1));
+  mrb_define_method_id (mrb, mrb_cMessage, MRB_SYM_Q (workflow_flag),
+                        gettextpo_message_m_workflow_flag_q, MRB_ARGS_REQ (1));
+  mrb_define_method_id (mrb, mrb_cMessage, MRB_SYM (update_workflow_flag),
+                        gettextpo_message_m_workflow_flag_update,
+                        MRB_ARGS_ANY ());
+  mrb_define_method_id (mrb, mrb_cMessage, MRB_SYM (workflow_flag_iterator),
+                        gettextpo_message_m_workflow_flag_iterator,
+                        MRB_ARGS_NONE ());
+
   mrb_define_method_id (mrb, mrb_cMessage, MRB_SYM_Q (format),
                         gettextpo_message_m_format_q, MRB_ARGS_REQ (1));
+  mrb_define_method_id (mrb, mrb_cMessage, MRB_SYM (format),
+                        gettextpo_message_m_format, MRB_ARGS_REQ (1));
   mrb_define_method_id (mrb, mrb_cMessage, MRB_SYM (update_format),
                         gettextpo_message_m_format_set, MRB_ARGS_ANY ());
+
+  mrb_define_method_id (mrb, mrb_cMessage, MRB_SYM_Q (sticky_flag),
+                        gettextpo_message_m_sticky_flag_q, MRB_ARGS_REQ (1));
+  mrb_define_method_id (mrb, mrb_cMessage, MRB_SYM (update_sticky_flag),
+                        gettextpo_message_m_sticky_flag_update,
+                        MRB_ARGS_ANY ());
+  mrb_define_method_id (mrb, mrb_cMessage, MRB_SYM (sticky_flag_iterator),
+                        gettextpo_message_m_sticky_flag_iterator,
+                        MRB_ARGS_NONE ());
 
   mrb_define_method_id (mrb, mrb_cMessage, MRB_SYM_Q (range),
                         gettextpo_message_m_range, MRB_ARGS_REQ (1));
@@ -842,6 +918,9 @@ mrb_mruby_gettextpo_gem_init (mrb_state *const mrb)
                         gettextpo_filepos_m_file, MRB_ARGS_NONE ());
   mrb_define_method_id (mrb, mrb_cFilePos, MRB_SYM (start_line),
                         gettextpo_filepos_m_start_line, MRB_ARGS_NONE ());
+  struct RClass *const mrb_cFlagIterator = mrb_define_class_under_id (
+      mrb, mrb_mGettextPO, MRB_SYM (FlagIterator), mrb->object_class);
+  MRB_SET_INSTANCE_TT (mrb_cFlagIterator, MRB_TT_CDATA);
   DONE;
 }
 

@@ -27,10 +27,9 @@
 #include <gettext-po.h>
 #include <ruby/internal/core/rdata.h>
 #include <ruby/internal/core/rstring.h>
-#include <ruby/internal/error.h>
-#include <ruby/internal/intern/variable.h>
+#include <ruby/internal/module.h>
+#include <ruby/internal/scan_args.h>
 #include <ruby/internal/special_consts.h>
-#include <ruby/internal/symbol.h>
 
 #define ERROR                                                                 \
   rb_const_get (rb_const_get (rb_cObject, rb_intern ("GettextPO")),           \
@@ -39,6 +38,7 @@
 VALUE rb_cMessage;
 VALUE rb_cMessageIterator;
 VALUE rb_cFilePos;
+VALUE rb_cFlagIterator;
 
 /* ********** error ********** */
 
@@ -166,6 +166,31 @@ static const struct po_xerror_handler gettextpo_xerror_handler = {
   .xerror = gettextpo_xerror,
   .xerror2 = gettextpo_xerror2,
 };
+
+/**
+ * Document-class: GettextPO::FlagIterator
+ */
+
+void
+gettextpo_flag_iterator_free (void *iter)
+{
+  if (iter)
+    po_flag_iterator_free (iter);
+}
+
+static const rb_data_type_t gettextpo_po_flag_iterator_type = {
+  .wrap_struct_name = "gettextpo PO flag iterator",
+  .function = {
+    .dfree = gettextpo_flag_iterator_free,
+  },
+  .flags = RUBY_TYPED_FREE_IMMEDIATELY,
+};
+
+VALUE
+gettextpo_po_flag_iterator_alloc (VALUE self)
+{
+  return TypedData_Wrap_Struct (self, &gettextpo_po_flag_iterator_type, NULL);
+}
 
 /**
  * Document-class: GettextPO::Message
@@ -399,6 +424,52 @@ BOOL_GETTER (fuzzy);
 BOOL_SETTER (fuzzy);
 
 #ifdef HAVE_PO_MESSAGE_GET_FORMAT
+#define FLAG_Q(name)                                                          \
+  static VALUE gettextpo_po_message_m_##name##_flag_q (VALUE self,            \
+                                                       VALUE flag)            \
+  {                                                                           \
+    return po_message_has_##name##_flag (DATA_PTR (self),                     \
+                                         StringValueCStr (flag))              \
+               ? Qtrue                                                        \
+               : Qfalse;                                                      \
+  }
+#define UPDATE_FLAG(name)                                                     \
+  static VALUE gettextpo_po_message_m_update_##name##_flag (                  \
+      int argc, VALUE *argv, VALUE self)                                      \
+  {                                                                           \
+    VALUE flag, kwargs;                                                       \
+    rb_scan_args (argc, argv, "1:", &flag, &kwargs);                          \
+    ID kwargs_ids[] = { rb_intern ("set") };                                  \
+    VALUE kwargs_vals[] = { Qundef };                                         \
+    rb_get_kwargs (kwargs, kwargs_ids, 0,                                     \
+                   sizeof (kwargs_ids) / sizeof (kwargs_ids[0]),              \
+                   kwargs_vals);                                              \
+                                                                              \
+    po_message_set_##name##_flag (DATA_PTR (self), StringValueCStr (flag),    \
+                                  RB_UNDEF_P (kwargs_vals[0])                 \
+                                      && RB_TEST (kwargs_vals[0]));           \
+    return Qnil;                                                              \
+  }
+#define FLAG_ITER(name)                                                       \
+  static VALUE gettextpo_po_message_m_##name##_flags_iterator (VALUE self)    \
+  {                                                                           \
+    VALUE iter = rb_obj_alloc (rb_cFlagIterator);                             \
+    DATA_PTR (iter) = po_message_##name##_flags_iterator (DATA_PTR (self));   \
+    return iter;                                                              \
+  }
+
+/**
+ * call-seq: workflow_flag? (flag)
+ */
+FLAG_Q (workflow);
+
+/**
+ * call-seq: update_workflow_flag (flag, set: true)
+ */
+UPDATE_FLAG (workflow);
+
+FLAG_ITER (workflow);
+
 /**
  * call-seq: format (type)
  *
@@ -458,6 +529,20 @@ gettextpo_po_message_m_format_set (int argc, VALUE *argv, VALUE self)
                          opposite ? 0 : (remove ? -1 : 1));
   return Qnil;
 }
+
+#ifdef HAVE_PO_MESSAGE_GET_FORMAT
+/**
+ * call-seq: sticky_flag? (flag)
+ */
+FLAG_Q (sticky);
+
+/**
+ * call-seq: update_sticky_flag (flag, set: true)
+ */
+UPDATE_FLAG (sticky);
+
+FLAG_ITER (sticky);
+#endif
 
 /**
  * call-seq: range? (range)
@@ -984,13 +1069,33 @@ Init_gettextpo (void)
   rb_define_method (rb_cMessage, "fuzzy?", gettextpo_po_message_m_fuzzy, 0);
   rb_define_method (rb_cMessage, "fuzzy=", gettextpo_po_message_m_fuzzy_set,
                     1);
+
+#ifdef HAVE_PO_MESSAGE_GET_FORMAT
+  rb_define_method (rb_cMessage, "workflow_flag?",
+                    gettextpo_po_message_m_workflow_flag_q, 1);
+  rb_define_method (rb_cMessage, "update_workflow_flag",
+                    gettextpo_po_message_m_update_workflow_flag, -1);
+  rb_define_method (rb_cMessage, "workflow_flag_iterator",
+                    gettextpo_po_message_m_workflow_flags_iterator, 0);
+#endif
+
+  rb_define_method (rb_cMessage, "format?", gettextpo_po_message_m_format_q,
+                    1);
 #ifdef HAVE_PO_MESSAGE_GET_FORMAT
   rb_define_method (rb_cMessage, "format", gettextpo_po_message_m_format, 1);
 #endif
-  rb_define_method (rb_cMessage, "format?", gettextpo_po_message_m_format_q,
-                    1);
   rb_define_method (rb_cMessage, "update_format",
                     gettextpo_po_message_m_format_set, -1);
+
+#ifdef HAVE_PO_MESSAGE_GET_FORMAT
+  rb_define_method (rb_cMessage, "sticky_flag?",
+                    gettextpo_po_message_m_sticky_flag_q, 1);
+  rb_define_method (rb_cMessage, "update_sticky_flag",
+                    gettextpo_po_message_m_update_sticky_flag, -1);
+  rb_define_method (rb_cMessage, "sticky_flag_iterator",
+                    gettextpo_po_message_m_sticky_flags_iterator, 0);
+#endif
+
   rb_define_method (rb_cMessage, "range?", gettextpo_po_message_m_range, 1);
   rb_define_method (rb_cMessage, "range=", gettextpo_po_message_m_range_set,
                     1);
@@ -1016,4 +1121,7 @@ Init_gettextpo (void)
   rb_define_method (rb_cFilePos, "file", gettextpo_po_filepos_m_file, 0);
   rb_define_method (rb_cFilePos, "start_line",
                     gettextpo_po_filepos_m_start_line, 0);
+  rb_cFlagIterator
+      = rb_define_class_under (rb_mGettextPO, "FlagIterator", rb_cObject);
+  rb_define_alloc_func (rb_cFlagIterator, gettextpo_po_flag_iterator_alloc);
 }
