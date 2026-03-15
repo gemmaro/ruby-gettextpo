@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## CRuby and mruby version 0.2.0 - 2026-03-15
+
 - CRuby and mruby: Add `GettextPO::Message#file_positions`,
   `GettextPO::Message#workflow_flag?`,
   `GettextPO::Message#update_workflow_flag`,
