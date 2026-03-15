@@ -84,6 +84,13 @@ static const struct mrb_data_type gettextpo_flag_iterator_data_type = {
   .dfree = gettextpo_flag_iterator_free,
 };
 
+static mrb_value
+gettextpo_flag_iterator_m_next (mrb_state *mrb, mrb_value self)
+{
+  const char *flag = po_flag_next (DATA_PTR (self));
+  return flag ? mrb_str_new_cstr (mrb, flag) : mrb_nil_value ();
+}
+
 static void
 gettextpo_message_free (mrb_state *mrb, void *message)
 {
@@ -921,6 +928,8 @@ mrb_mruby_gettextpo_gem_init (mrb_state *const mrb)
   struct RClass *const mrb_cFlagIterator = mrb_define_class_under_id (
       mrb, mrb_mGettextPO, MRB_SYM (FlagIterator), mrb->object_class);
   MRB_SET_INSTANCE_TT (mrb_cFlagIterator, MRB_TT_CDATA);
+  mrb_define_method_id (mrb, mrb_cFlagIterator, MRB_SYM (next),
+                        gettextpo_flag_iterator_m_next, MRB_ARGS_NONE ());
   DONE;
 }
 

@@ -27,6 +27,7 @@
 #include <gettext-po.h>
 #include <ruby/internal/core/rdata.h>
 #include <ruby/internal/core/rstring.h>
+#include <ruby/internal/intern/string.h>
 #include <ruby/internal/module.h>
 #include <ruby/internal/scan_args.h>
 #include <ruby/internal/special_consts.h>
@@ -190,6 +191,13 @@ VALUE
 gettextpo_po_flag_iterator_alloc (VALUE self)
 {
   return TypedData_Wrap_Struct (self, &gettextpo_po_flag_iterator_type, NULL);
+}
+
+static VALUE
+gettextpo_po_flag_iterator_m_next (VALUE self)
+{
+  const char *flag = po_flag_next (DATA_PTR (self));
+  return flag ? rb_str_new_cstr (flag) : Qnil;
 }
 
 /**
@@ -1124,4 +1132,6 @@ Init_gettextpo (void)
   rb_cFlagIterator
       = rb_define_class_under (rb_mGettextPO, "FlagIterator", rb_cObject);
   rb_define_alloc_func (rb_cFlagIterator, gettextpo_po_flag_iterator_alloc);
+  rb_define_method (rb_cFlagIterator, "next",
+                    gettextpo_po_flag_iterator_m_next, 0);
 }
