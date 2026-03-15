@@ -1,0 +1,2 @@
+CompileFlags:
+  Add: [-DHAVE_PO_MESSAGE_GET_FORMAT]
