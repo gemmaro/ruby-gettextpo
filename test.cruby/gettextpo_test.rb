@@ -28,6 +28,7 @@ class GettextPOTest < Test::Unit::TestCase
       check
       file
       filepos
+      flag
       format
       header
       message

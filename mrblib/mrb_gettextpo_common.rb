@@ -86,4 +86,14 @@ module GettextPO
             "please use other methods instead, such as GettextPO::Message#filepos"
     end
   end
+
+  # This class doesn't provide the +new+ class method.  See also
+  # GettextPO::Message#workflow_flag_iterator and
+  # GettextPO::Message#sticky_flag_iterator.
+  class FlagIterator
+    def self.new # :nodoc:
+      raise NoMethodError,
+            "please use other methods instead, such as GettextPO::Message#workflow_flag_iterator"
+    end
+  end
 end
