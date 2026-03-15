@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-- Add `GettextPO::Message#file_positions` method.
+- CRuby and mruby: Add `GettextPO::Message#file_positions` method.
+- mruby: Requires GNU gettext 1.0 or later.
 
 ## CRuby version 0.1.3
 

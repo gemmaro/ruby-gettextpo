@@ -8,10 +8,10 @@ Currently this supports both CRuby and mruby.
 
 ## Installation
 
-Prerequisites: `libgettextpo` library.  On Linux and similar systems,
-you should be able to install it as a distribution package on most
-platforms.  For example, on Ubuntu it was as follows
-(2026-03-07T15:48:13+09:00):
+Prerequisites: `libgettextpo` library (mruby: version 1.0 or later).
+On Linux and similar systems, you should be able to install it as a
+distribution package on most platforms.  For example, on Ubuntu it was
+as follows (2026-03-07T15:48:13+09:00):
 
 ``` shell
 apt search libgettextpo

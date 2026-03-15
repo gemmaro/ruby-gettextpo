@@ -180,12 +180,34 @@ BOOL_GETTER (fuzzy);
 BOOL_SETTER (fuzzy);
 
 static mrb_value
-gettextpo_message_m_format (mrb_state *mrb, mrb_value self)
+gettextpo_message_m_format_q (mrb_state *mrb, mrb_value self)
 {
   char *format = NULL;
   mrb_get_args (mrb, "z", &format);
 
   return mrb_bool_value (po_message_is_format (DATA_PTR (self), format));
+}
+
+static mrb_value
+gettextpo_message_m_format (mrb_state *mrb, mrb_value self)
+{
+  char *format = NULL;
+  mrb_get_args (mrb, "z", &format);
+
+  switch (po_message_get_format (DATA_PTR (self), format))
+    {
+    case 1:
+      return mrb_true_value ();
+      break;
+    case 0:
+      return mrb_false_value ();
+      break;
+    case -1:
+      return mrb_nil_value ();
+      break;
+    default:
+      mrb_raise (mrb, ERROR, "unreachable");
+    }
 }
 
 static mrb_value
@@ -784,10 +806,14 @@ mrb_mruby_gettextpo_gem_init (mrb_state *const mrb)
                         gettextpo_message_m_fuzzy, MRB_ARGS_NONE ());
   mrb_define_method_id (mrb, mrb_cMessage, MRB_SYM_E (fuzzy),
                         gettextpo_message_m_fuzzy_set, MRB_ARGS_REQ (1));
-  mrb_define_method_id (mrb, mrb_cMessage, MRB_SYM_Q (format),
+
+  mrb_define_method_id (mrb, mrb_cMessage, MRB_SYM (format),
                         gettextpo_message_m_format, MRB_ARGS_REQ (1));
+  mrb_define_method_id (mrb, mrb_cMessage, MRB_SYM_Q (format),
+                        gettextpo_message_m_format_q, MRB_ARGS_REQ (1));
   mrb_define_method_id (mrb, mrb_cMessage, MRB_SYM (update_format),
                         gettextpo_message_m_format_set, MRB_ARGS_ANY ());
+
   mrb_define_method_id (mrb, mrb_cMessage, MRB_SYM_Q (range),
                         gettextpo_message_m_range, MRB_ARGS_REQ (1));
   mrb_define_method_id (mrb, mrb_cMessage, MRB_SYM_E (range),
