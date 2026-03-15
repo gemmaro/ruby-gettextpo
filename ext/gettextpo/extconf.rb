@@ -22,8 +22,9 @@ require "mkmf"
 # selectively, or entirely remove this flag.
 append_cflags("-fvisibility=hidden")
 
-have_header("gettext-po.h") or raise "gettext-po.h not found"
+GETTEXTPO = "gettext-po.h"
+have_header(GETTEXTPO) or raise "gettext-po.h not found"
 have_library("gettextpo") or raise "gettextpo library not found"
-# TODO: check library function
+have_func('po_message_get_format', GETTEXTPO)
 
 create_makefile("gettextpo/gettextpo")

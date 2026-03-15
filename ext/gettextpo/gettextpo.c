@@ -26,7 +26,11 @@
 #include "gettextpo.h"
 #include <gettext-po.h>
 #include <ruby/internal/core/rdata.h>
+#include <ruby/internal/core/rstring.h>
+#include <ruby/internal/error.h>
 #include <ruby/internal/intern/variable.h>
+#include <ruby/internal/special_consts.h>
+#include <ruby/internal/symbol.h>
 
 #define ERROR                                                                 \
   rb_const_get (rb_const_get (rb_cObject, rb_intern ("GettextPO")),           \
@@ -394,11 +398,39 @@ BOOL_GETTER (fuzzy);
  */
 BOOL_SETTER (fuzzy);
 
+#ifdef HAVE_PO_MESSAGE_GET_FORMAT
+/**
+ * call-seq: format (type)
+ *
+ * Returns +true+, +false+ (opposite), or +nil+ (none).
+ */
+static VALUE
+gettextpo_po_message_m_format (VALUE self, VALUE format)
+{
+  int result
+      = po_message_get_format (DATA_PTR (self), StringValueCStr (format));
+  switch (result)
+    {
+    case 1:
+      return Qtrue;
+      break;
+    case 0:
+      return Qfalse;
+      break;
+    case -1:
+      return Qnil;
+      break;
+    default:
+      rb_raise (ERROR, "unreachable");
+    }
+}
+#endif
+
 /**
  * call-seq: format? (type)
  */
 VALUE
-gettextpo_po_message_m_format (VALUE self, VALUE format)
+gettextpo_po_message_m_format_q (VALUE self, VALUE format)
 {
   return po_message_is_format (DATA_PTR (self), StringValueCStr (format))
              ? Qtrue
@@ -952,7 +984,11 @@ Init_gettextpo (void)
   rb_define_method (rb_cMessage, "fuzzy?", gettextpo_po_message_m_fuzzy, 0);
   rb_define_method (rb_cMessage, "fuzzy=", gettextpo_po_message_m_fuzzy_set,
                     1);
-  rb_define_method (rb_cMessage, "format?", gettextpo_po_message_m_format, 1);
+#ifdef HAVE_PO_MESSAGE_GET_FORMAT
+  rb_define_method (rb_cMessage, "format", gettextpo_po_message_m_format, 1);
+#endif
+  rb_define_method (rb_cMessage, "format?", gettextpo_po_message_m_format_q,
+                    1);
   rb_define_method (rb_cMessage, "update_format",
                     gettextpo_po_message_m_format_set, -1);
   rb_define_method (rb_cMessage, "range?", gettextpo_po_message_m_range, 1);

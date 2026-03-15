@@ -48,9 +48,19 @@ assert 'getters and setters' do
   assert_true message.obsolete?
   message.fuzzy = true
   assert_true message.fuzzy?
+
+  if message.respond_to?(:format)
+    assert_nil message.format('c-format')
+  end
   message.update_format("c-format")
+  if message.respond_to?(:format)
+    assert_true message.format('c-format')
+  end
   assert_true message.format?("c-format")
   message.update_format("objc-format", opposite: true)
+  if message.respond_to?(:format)
+    assert_false message.format('objc-format')
+  end
   assert_false message.format?("objc-format")
   message.update_format("csharp-format")
   message.update_format("csharp-format", remove: true)
