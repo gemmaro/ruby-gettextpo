@@ -27,6 +27,8 @@
 #include <gettext-po.h>
 #include <ruby/internal/core/rdata.h>
 #include <ruby/internal/core/rstring.h>
+#include <ruby/internal/error.h>
+#include <ruby/internal/globals.h>
 #include <ruby/internal/intern/string.h>
 #include <ruby/internal/module.h>
 #include <ruby/internal/scan_args.h>
@@ -197,7 +199,10 @@ static VALUE
 gettextpo_po_flag_iterator_m_next (VALUE self)
 {
   const char *flag = po_flag_next (DATA_PTR (self));
-  return flag ? rb_str_new_cstr (flag) : Qnil;
+  if (flag)
+    return rb_str_new_cstr (flag);
+  else
+    rb_raise (rb_eStopIteration, "no more flag");
 }
 
 /**

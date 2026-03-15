@@ -10,7 +10,7 @@
   `GettextPO::Message#update_sticky_flag`, and
   `GettextPO::Message#sticky_flag_iterator` method.
 - CRuby and mruby: Add `GettextPO::FlagIterator#next` method (and the
-  class).
+  class, which is `Enumerable`).
 - mruby: Requires GNU gettext 1.0 or later.
 
 ## CRuby version 0.1.3

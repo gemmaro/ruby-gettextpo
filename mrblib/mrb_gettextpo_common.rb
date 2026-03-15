@@ -95,5 +95,17 @@ module GettextPO
       raise NoMethodError,
             "please use other methods instead, such as GettextPO::Message#workflow_flag_iterator"
     end
+
+    def each # yields: flag
+      while true
+        begin
+          yield self.next
+        rescue StopIteration
+          return self
+        end
+      end
+    end
+
+    include Enumerable
   end
 end

@@ -42,6 +42,7 @@
 #define ERROR mrb_class_get_under_id (mrb, MODULE, MRB_SYM (Error))
 
 #define NIL mrb_nil_value ()
+#define STOP_ITERATION mrb_class_get_id (mrb, MRB_SYM (StopIteration))
 
 static mrb_value
 gettextpo_m_header_entry_value (mrb_state *mrb, mrb_value klass)
@@ -88,7 +89,10 @@ static mrb_value
 gettextpo_flag_iterator_m_next (mrb_state *mrb, mrb_value self)
 {
   const char *flag = po_flag_next (DATA_PTR (self));
-  return flag ? mrb_str_new_cstr (mrb, flag) : mrb_nil_value ();
+  if (flag)
+    return mrb_str_new_cstr (mrb, flag);
+  else
+    mrb_raise (mrb, STOP_ITERATION, "no more flag");
 }
 
 static void
@@ -615,8 +619,7 @@ gettextpo_message_iterator_m_next (mrb_state *mrb, mrb_value message_iterator)
       return value;
     }
   else
-    mrb_raise (mrb, mrb_class_get_id (mrb, MRB_SYM (StopIteration)),
-               "end of PO message iterator");
+    mrb_raise (mrb, STOP_ITERATION, "end of PO message iterator");
 }
 
 static mrb_value
