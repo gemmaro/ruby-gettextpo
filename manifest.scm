@@ -38,6 +38,6 @@
                           gcc-toolchain
                           gdb
                           clang
-                          ruby-3.4
+                          ruby-3.3
                           ruby-rake-compiler
                           gnu-make))
