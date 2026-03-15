@@ -27,5 +27,6 @@ assert 'basic' do
   assert_nil message.filepos(1)
   message.add_filepos("roku-nana.txt", 67)
   assert_equal "roku-nana.txt", message.filepos(1).file
+  assert_equal ["spec2.txt", "roku-nana.txt"], message.file_positions.map(&:file)
   true
 end

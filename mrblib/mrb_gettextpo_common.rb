@@ -66,6 +66,16 @@ module GettextPO
       raise NoMethodError,
             "please use other methods instead, such as GettextPO::MessageIterator#next"
     end
+
+    def file_positions
+      positions = []
+      index = 0
+      while (pos = filepos(index))
+        positions << pos
+        index += 1
+      end
+      positions
+    end
   end
 
   # This class doesn't provide the +new+ class method.  See also

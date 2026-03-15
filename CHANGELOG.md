@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add `GettextPO::Message#file_positions` method.
+
 ## CRuby version 0.1.3
 
 - CRuby: Fix file not found case.
