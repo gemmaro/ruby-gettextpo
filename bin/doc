@@ -1,0 +1,3 @@
+#!/bin/sh
+set -eu
+guix shell ruby@3.4 -- rdoc
