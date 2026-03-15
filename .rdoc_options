@@ -10,3 +10,5 @@ exclude:
   - mrbgem.rake
   - mrblib/mrb_gettextpo.rb
   - mrblib/mrb_gettextpo_version.rb
+  - manifest.scm
+  - ext/gettextpo/extconf.rb
