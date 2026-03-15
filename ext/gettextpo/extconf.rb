@@ -25,6 +25,8 @@ append_cflags("-fvisibility=hidden")
 GETTEXTPO = "gettext-po.h"
 have_header(GETTEXTPO) or raise "gettext-po.h not found"
 have_library("gettextpo") or raise "gettextpo library not found"
+
+# Indicates 1.0 or later.  <https://savannah.gnu.org/news/?id=10853>
 have_func('po_message_get_format', GETTEXTPO)
 
 create_makefile("gettextpo/gettextpo")
